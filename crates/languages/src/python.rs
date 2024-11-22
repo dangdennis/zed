@@ -2,8 +2,8 @@ use anyhow::ensure;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use collections::HashMap;
-use gpui::AsyncAppContext;
 use gpui::{AppContext, Task};
+use gpui::{AsyncAppContext, SharedString};
 use language::language_settings::language_settings;
 use language::LanguageName;
 use language::LanguageToolchainStore;
@@ -498,8 +498,17 @@ fn python_module_name_from_relative_path(relative_path: &str) -> String {
         .to_string()
 }
 
-#[derive(Default)]
-pub(crate) struct PythonToolchainProvider {}
+pub(crate) struct PythonToolchainProvider {
+    term: SharedString,
+}
+
+impl Default for PythonToolchainProvider {
+    fn default() -> Self {
+        Self {
+            term: SharedString::new_static("Virtual Environment"),
+        }
+    }
+}
 
 static ENV_PRIORITY_LIST: &'static [PythonEnvironmentKind] = &[
     // Prioritize non-Conda environments.
@@ -591,8 +600,9 @@ impl ToolchainLister for PythonToolchainProvider {
                 .into();
                 Some(Toolchain {
                     name,
-                    path: toolchain.executable?.to_str()?.to_owned().into(),
+                    path: toolchain.executable.as_ref()?.to_str()?.to_owned().into(),
                     language_name: LanguageName::new("Python"),
+                    as_json: serde_json::to_value(toolchain).ok()?,
                 })
             })
             .collect();
@@ -602,6 +612,9 @@ impl ToolchainLister for PythonToolchainProvider {
             default: None,
             groups: Default::default(),
         }
+    }
+    fn term(&self) -> SharedString {
+        self.term.clone()
     }
 }
 

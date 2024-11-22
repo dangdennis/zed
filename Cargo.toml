@@ -9,6 +9,7 @@ members = [
     "crates/assistant_tool",
     "crates/audio",
     "crates/auto_update",
+    "crates/auto_update_ui",
     "crates/breadcrumbs",
     "crates/call",
     "crates/channel",
@@ -128,6 +129,7 @@ members = [
     "crates/util",
     "crates/vcs_menu",
     "crates/vim",
+    "crates/vim_mode_setting",
     "crates/welcome",
     "crates/workspace",
     "crates/worktree",
@@ -187,6 +189,7 @@ assistant_slash_command = { path = "crates/assistant_slash_command" }
 assistant_tool = { path = "crates/assistant_tool" }
 audio = { path = "crates/audio" }
 auto_update = { path = "crates/auto_update" }
+auto_update_ui = { path = "crates/auto_update_ui" }
 breadcrumbs = { path = "crates/breadcrumbs" }
 call = { path = "crates/call" }
 channel = { path = "crates/channel" }
@@ -302,6 +305,7 @@ ui_macros = { path = "crates/ui_macros" }
 util = { path = "crates/util" }
 vcs_menu = { path = "crates/vcs_menu" }
 vim = { path = "crates/vim" }
+vim_mode_setting = { path = "crates/vim_mode_setting" }
 welcome = { path = "crates/welcome" }
 workspace = { path = "crates/workspace" }
 worktree = { path = "crates/worktree" }
