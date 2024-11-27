@@ -2919,6 +2919,21 @@ impl LspStore {
             })
     }
 
+    pub fn diagnostics_for_buffer(
+        &self,
+        path: &ProjectPath,
+    ) -> Option<
+        &[(
+            LanguageServerId,
+            Vec<DiagnosticEntry<Unclipped<PointUtf16>>>,
+        )],
+    > {
+        self.diagnostics
+            .get(&path.worktree_id)?
+            .get(&path.path)
+            .map(|diagnostics| diagnostics.as_slice())
+    }
+
     pub fn started_language_servers(&self) -> Vec<(WorktreeId, LanguageServerName)> {
         self.language_server_ids.keys().cloned().collect()
     }
@@ -5523,10 +5538,16 @@ impl LspStore {
                 .unwrap_or_default(),
             allow_binary_download,
         };
+        let toolchains = self.toolchain_store(cx);
         cx.spawn(|_, mut cx| async move {
             let binary_result = adapter
                 .clone()
-                .get_language_server_command(delegate.clone(), lsp_binary_options, &mut cx)
+                .get_language_server_command(
+                    delegate.clone(),
+                    toolchains,
+                    lsp_binary_options,
+                    &mut cx,
+                )
                 .await;
 
             delegate.update_status(adapter.name.clone(), LanguageServerBinaryStatus::None);
@@ -7783,6 +7804,7 @@ impl LspAdapter for SshLspAdapter {
     async fn check_if_user_installed(
         &self,
         _: &dyn LspAdapterDelegate,
+        _: Arc<dyn LanguageToolchainStore>,
         _: &AsyncAppContext,
     ) -> Option<LanguageServerBinary> {
         Some(self.binary.clone())
